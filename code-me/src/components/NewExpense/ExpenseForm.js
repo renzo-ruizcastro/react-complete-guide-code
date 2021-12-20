@@ -1,7 +1,7 @@
 import './ExpenseForm.css';
 import { useState } from 'react';
 
-const ExpenseForm = () => {
+const ExpenseForm = props => {
   const [enteredTitle, setEnteredTitle] = useState('');
   const [enteredAmount, setEnteredAmount] = useState('');
   const [enteredDate, setEnteredDate] = useState('');
@@ -37,8 +37,12 @@ const ExpenseForm = () => {
       title: enteredTitle,
       amount: enteredAmount,
       date: new Date(enteredDate), // We want a Date object, not a string here
+      // Saving uplifting code
+      id: Math.random().toString(),
     };
-    console.log(expenseData);
+    // props.onSaveExpenseData(expenseData);
+    // Saving uplifting code
+    props.onAddExpense(expenseData);
     // Cleaning fields
     setEnteredTitle('');
     setEnteredAmount('');
