@@ -35,8 +35,11 @@ const ExpenseForm = props => {
     e.preventDefault();
     const expenseData = {
       title: enteredTitle,
-      amount: enteredAmount,
-      date: new Date(enteredDate), // We want a Date object, not a string here
+      amount: +enteredAmount, // to number
+      // We want a Date object, not a string here
+      // JS Date sets the date time to UTC by default if you don't specify one
+      date: new Date(enteredDate + 'T00:00'),
+
       // Saving uplifting code
       id: Math.random().toString(),
     };
@@ -47,6 +50,7 @@ const ExpenseForm = props => {
     setEnteredTitle('');
     setEnteredAmount('');
     setEnteredDate('');
+    props.onClose();
   };
 
   return (
@@ -88,6 +92,9 @@ const ExpenseForm = props => {
         </div>
       </div>
       <div className="new-expense__actions">
+        <button type="button" onClick={props.onClose}>
+          Cancel
+        </button>
         <button type="submit">Add expense</button>
       </div>
     </form>
