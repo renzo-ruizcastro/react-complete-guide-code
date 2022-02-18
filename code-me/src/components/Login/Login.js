@@ -1,30 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
 
-const Login = (props) => {
+const Login = props => {
   const [enteredEmail, setEnteredEmail] = useState('');
   const [emailIsValid, setEmailIsValid] = useState();
   const [enteredPassword, setEnteredPassword] = useState('');
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
-  const emailChangeHandler = (event) => {
-    setEnteredEmail(event.target.value);
+  useEffect(
+    () => {
+      // save code, one place
+      // validation is still a side effect
+      // whenever you have an action that should be executed in response to another action could be considered as a side effect
+      setFormIsValid(
+        enteredEmail.includes('@') && enteredPassword.trim().length > 6
+      );
+    },
+    // add as dependencies the variables you use in the effect function that aren't only scoped to it
+    // state updating functions are ensured by React to never change, so you can prescinde of them
+    [enteredEmail, enteredPassword]
+  );
 
+  const emailChangeHandler = event => {
+    setEnteredEmail(event.target.value);
+    /*
     setFormIsValid(
-      event.target.value.includes('@') && enteredPassword.trim().length > 6
+      enteredEmail.includes('@') && enteredPassword.trim().length > 6
     );
+    */
   };
 
-  const passwordChangeHandler = (event) => {
+  const passwordChangeHandler = event => {
     setEnteredPassword(event.target.value);
-
+    /*
     setFormIsValid(
-      event.target.value.trim().length > 6 && enteredEmail.includes('@')
+      enteredEmail.includes('@') && enteredPassword.trim().length > 6
     );
+    */
   };
 
   const validateEmailHandler = () => {
@@ -35,7 +51,7 @@ const Login = (props) => {
     setPasswordIsValid(enteredPassword.trim().length > 6);
   };
 
-  const submitHandler = (event) => {
+  const submitHandler = event => {
     event.preventDefault();
     props.onLogin(enteredEmail, enteredPassword);
   };
