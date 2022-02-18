@@ -11,19 +11,29 @@ const Login = props => {
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
-  useEffect(
-    () => {
-      // save code, one place
-      // validation is still a side effect
-      // whenever you have an action that should be executed in response to another action could be considered as a side effect
+  useEffect(() => {
+    // With setTimeout we are not running the function immediately, but after a delay
+    const timer = setTimeout(() => {
+      console.log('Checking form validity!');
       setFormIsValid(
         enteredEmail.includes('@') && enteredPassword.trim().length > 6
       );
-    },
-    // add as dependencies the variables you use in the effect function that aren't only scoped to it
-    // state updating functions are ensured by React to never change, so you can prescinde of them
-    [enteredEmail, enteredPassword]
-  );
+    }, 500);
+    // Until here we're only delaying the input validation in each keystroke
+    // Our goal is to validate the input only when the user has stopped typing. (debouncing) In other words when there's been at least 500ms of inactivity
+    // This involves completing the timeout function only in these cases
+
+    // ANSWER: return a cleanup function
+    // Works as a cleanup process before useEffect runs again
+    // Whenever the effect function runs, except the first time (component mounted), BEFORE it runs, the cleanup function will run
+    // Also runs (before) whenever the component that stores the useEffect hook is unmounted from the DOM
+    // not necessarily an anonymous function
+    return () => {
+      console.log('CLEANUP');
+      // We clear the timer before a new useEffect execution
+      clearTimeout(timer);
+    };
+  }, [enteredEmail, enteredPassword]);
 
   const emailChangeHandler = event => {
     setEnteredEmail(event.target.value);
