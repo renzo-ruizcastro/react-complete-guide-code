@@ -11,6 +11,10 @@ const Login = props => {
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
+  // useEffect(() => {
+  //   console.log('EFFECT RUNNING');
+  // }, []);
+
   useEffect(() => {
     // With setTimeout we are not running the function immediately, but after a delay
     const timer = setTimeout(() => {
