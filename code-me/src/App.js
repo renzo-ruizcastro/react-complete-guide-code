@@ -27,6 +27,7 @@ function App() {
     // But it's just a dummy/ demo anyways
     setIsLoggedIn(true);
     // the value stored is a string
+    console.log(email, password);
     localStorage.setItem('isLoggedIn', '1');
   };
 
