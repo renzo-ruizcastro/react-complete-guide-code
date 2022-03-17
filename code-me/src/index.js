@@ -3,5 +3,12 @@ import ReactDOM from 'react-dom';
 
 import './index.css';
 import App from './App';
+import { AuthContextProvider } from './context/auth-context';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+// Now this is the central space for the auth state management
+ReactDOM.render(
+  <AuthContextProvider>
+    <App />
+  </AuthContextProvider>,
+  document.getElementById('root')
+);
