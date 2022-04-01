@@ -1,13 +1,9 @@
-// Kebab case
 import React, { useState, useEffect } from 'react';
 
-// AuthContext is an object that store components (Provider)
 const AuthContext = React.createContext(
-  // default context, often an object
   { isLoggedIn: false, onLogout: () => {}, onLogin: (email, password) => {} }
 );
 
-// This is a component
 export const AuthContextProvider = props => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
