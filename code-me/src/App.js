@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 
 import MoviesList from './components/MoviesList';
+import AddMovie from './components/AddMovie';
 import './App.css';
 
 function App() {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // const dummyMovies = [
   //   {
@@ -35,11 +37,14 @@ function App() {
   // }
 
   // function fetchMoviesHandler() {
-  //   // Sending a HTTP request is a asynchronous operation
+  //   setIsLoading(true);
+  //   setError(null);
   //   fetch('https://swapi.dev/api/films/')
   //     .then(response => {
-  //       // The response originally is a Response object
-  //       return response.json(); // .json() returns a promise to give the response's body converted to JSON
+  //       if (!response.ok) {
+  //         throw new Error(response.status);
+  //       }
+  //       return response.json();
   //     })
   //     .then(data => {
   //       const transformedMovies = data.results.map(movie => {
@@ -51,31 +56,44 @@ function App() {
   //         };
   //       });
   //       setMovies(transformedMovies);
-  //     }); // returns a promise
-  //   // fetch receives as second parameter an object with options, one of them is the method (GET, POST, PUT, DELETE)
-  //   // by default the method is GET
+  //     })
+  //     .catch(err => {
+  //       setError(err.message);
+  //     });
+  //   setIsLoading(false);
   // }
 
   // async function fetchMoviesHandler() {
-  //   // Use await whenever it's returning a promise
-  //   const response = await fetch('https://swapi.dev/api/films/');
-  //   const data = await response.json();
-  //   // The lines above are equivalent to use then()
-  //   const transformedMovies = data.results.map(movie => {
-  //     return {
-  //       id: movie.episode_id,
-  //       title: movie.title,
-  //       openingText: movie.opening_crawl,
-  //       releaseDate: movie.release_date,
-  //     };
-  //   })
-  //   setMovies(transformedMovies);
+  //   setIsLoading(true);
+  //   setError(null);
+  //   try {
+  //     const response = await fetch('https://swapi.dev/api/films/');
+  //     console.log(response);
+  //     if (!response.ok) {
+  //       throw new Error(response.status);
+  //     }
+  //     // Some APIs still send back JSON data even if the request was not successful and some, none
+  //     const data = await response.json();
+  //     const transformedMovies = data.results.map(movie => {
+  //       return {
+  //         id: movie.episode_id,
+  //         title: movie.title,
+  //         openingText: movie.opening_crawl,
+  //         releaseDate: movie.release_date,
+  //       };
+  //     })
+  //     setMovies(transformedMovies);
+  //   } catch(err) {
+  //     setError(err.message);
+  //   }
+  //   setIsLoading(false);
   // }
 
   // function fetchMoviesHandler() {
-  //   // axios seems to be faster than fetch
-  //   axios.get('https://swapi.dev/api/films/')
-  //     // axios returns an object with a property called data in which we can access the response body already converted to JSON
+  //   setIsLoading(true);
+  //   setError(null);
+  //   axios
+  //     .get('https://swapi.dev/api/film/')
   //     .then(response => {
   //       const transformedMovies = response.data.results.map(movie => {
   //         return {
@@ -87,33 +105,81 @@ function App() {
   //       });
   //       setMovies(transformedMovies);
   //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //       setError(err.message);
+  //     });
+  //   setIsLoading(false);
   // }
 
-  async function fetchMoviesHandler() {
+  const fetchMoviesHandler = useCallback(async () => {
     setIsLoading(true);
-    const response = await axios.get('https://swapi.dev/api/films/');
-    const transformedMovies = response.data.results.map(movie => {
-      return {
-        id: movie.episode_id,
-        title: movie.title,
-        openingText: movie.opening_crawl,
-        releaseDate: movie.release_date,
-      };
-    });
-    setMovies(transformedMovies);
+    setError(null);
+    try {
+      const response = await axios.get('https://react-http-95fe3-default-rtdb.firebaseio.com/movies.json');
+      const loadedMovies = [];
+      for (const key in response.data) {
+        loadedMovies.push({
+          ...response.data[key],
+          id: key
+        });
+      }
+      // const transformedMovies = loadedMovies.map(movie => {
+      //   return {
+      //     id: movie.episode_id,
+      //     title: movie.title,
+      //     openingText: movie.opening_crawl,
+      //     releaseDate: movie.release_date,
+      //   };
+      // });
+      setMovies(loadedMovies);
+    } catch (err) {
+      setError(err.message);
+    }
     setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchMoviesHandler();
+  }, [fetchMoviesHandler]);
+
+  async function addMovieHandler(movie) {
+    console.log(movie);
+    const response = await fetch('https://react-http-95fe3-default-rtdb.firebaseio.com/movies.json', {
+      // What POST does depends on the backend, but typically creates a new resource
+      method: 'POST',
+      // body requires JSON data
+      body: JSON.stringify(movie),
+      headers: {
+        // Describes the content of the body
+        'Content-Type': 'application/json',
+      }
+    })
+    const data = await response.json();
+    console.log(data);
+    // You can handle errors here as well
+  }
+
+  let content = <p>Found no movies.</p>;
+  if (movies.length > 0) {
+    content = <MoviesList movies={movies} />;
+  }
+  if (error) {
+    content = <p>Error: {error}</p>;
+  }
+  if (isLoading) {
+    content = <p>Loading...</p>;
   }
 
   return (
     <React.Fragment>
       <section>
-        <button onClick={fetchMoviesHandler}>Fetch Movies</button>
+        <AddMovie onAddMovie={addMovieHandler} />
       </section>
       <section>
-        {!isLoading && movies.length > 0 && <MoviesList movies={movies} />}
-        {!isLoading && movies.length === 0 && <p>Found no movies</p>}
-        {isLoading && <p>Loading...</p>}
+        <button onClick={fetchMoviesHandler}>Fetch Movies</button>
       </section>
+      <section>{content}</section>
     </React.Fragment>
   );
 }
