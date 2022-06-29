@@ -143,21 +143,26 @@ function App() {
     fetchMoviesHandler();
   }, [fetchMoviesHandler]);
 
+  // async function addMovieHandler(movie) {
+  //   console.log(movie);
+  //   const response = await fetch('https://react-http-95fe3-default-rtdb.firebaseio.com/movies.json', {
+  //     // What POST does depends on the backend, but typically creates a new resource
+  //     method: 'POST',
+  //     // body requires JSON data
+  //     body: JSON.stringify(movie),
+  //     headers: {
+  //       // Describes the content of the body
+  //       'Content-Type': 'application/json',
+  //     }
+  //   })
+  //   const data = await response.json();
+  //   console.log(data);
+  //   // You can handle errors here as well
+  // }
+
   async function addMovieHandler(movie) {
-    console.log(movie);
-    const response = await fetch('https://react-http-95fe3-default-rtdb.firebaseio.com/movies.json', {
-      // What POST does depends on the backend, but typically creates a new resource
-      method: 'POST',
-      // body requires JSON data
-      body: JSON.stringify(movie),
-      headers: {
-        // Describes the content of the body
-        'Content-Type': 'application/json',
-      }
-    })
-    const data = await response.json();
-    console.log(data);
-    // You can handle errors here as well
+    const response = await axios.post('https://react-http-95fe3-default-rtdb.firebaseio.com/movies.json', movie);
+    console.log(response.data);
   }
 
   let content = <p>Found no movies.</p>;
