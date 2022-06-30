@@ -8,12 +8,12 @@ function App() {
   const [error, setError] = useState(null);
   const [tasks, setTasks] = useState([]);
 
-  const fetchTasks = async (taskText) => {
+  const fetchTasks = async taskText => {
     setIsLoading(true);
     setError(null);
     try {
       const response = await fetch(
-        'https://react-http-6b4a6.firebaseio.com/tasks.json'
+        'https://react-http-95fe3-default-rtdb.firebaseio.com/tasks.json'
       );
 
       if (!response.ok) {
@@ -39,8 +39,8 @@ function App() {
     fetchTasks();
   }, []);
 
-  const taskAddHandler = (task) => {
-    setTasks((prevTasks) => prevTasks.concat(task));
+  const taskAddHandler = task => {
+    setTasks(prevTasks => prevTasks.concat(task));
   };
 
   return (
