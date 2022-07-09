@@ -1,31 +1,63 @@
-import { useState } from "react";
+import { useState, useReducer } from 'react';
 
-const useInput = (validateValue) => {
-    const [value, setValue] = useState('');
-    const [isTouched, setIsTouched] = useState(false);
+const initialInputState = {
+  value: '',
+  isTouched: false,
+};
 
-    const valueIsValid = validateValue(value);
-    const hasError = !valueIsValid && isTouched;
+const inputStateReducer = (state, action) => {
+  switch (action.type) {
+    case 'CHANGE':
+      return {
+        ...state,
+        value: action.value,
+      };
+    case 'BLUR':
+      // return { value: state.value, isTouched: true };
+      return { ...state, isTouched: true };
+    case 'RESET':
+      return initialInputState;
+    default:
+      return initialInputState;
+  }
+};
 
-    const inputChangeHandler = event => {
-        setValue(event.target.value);
-    }
-    const inputBlurHandler = () => {
-        setIsTouched(true);
-    }
-    const reset = () => {
-        setValue('');
-        setIsTouched(false);
-    }
+const useInput = validateValue => {
+  const [inputState, dispatch] = useReducer(
+    inputStateReducer,
+    initialInputState
+  );
+  // const [value, setValue] = useState('');
+  // const [isTouched, setIsTouched] = useState(false);
 
-    return {
-        value,
-        isValid: valueIsValid,
-        hasError,
-        inputChangeHandler,
-        inputBlurHandler,
-        reset
-    }
+  const valueIsValid = validateValue(inputState.value);
+  const hasError = !valueIsValid && inputState.isTouched;
+
+  const inputChangeHandler = event => {
+    dispatch({
+      type: 'CHANGE',
+      value: event.target.value,
+    });
+  };
+  const inputBlurHandler = () => {
+    dispatch({
+      type: 'BLUR',
+    });
+  };
+  const reset = () => {
+    dispatch({
+      type: 'RESET',
+    });
+  };
+
+  return {
+    value: inputState.value,
+    isValid: valueIsValid,
+    hasError,
+    inputChangeHandler,
+    inputBlurHandler,
+    reset,
+  };
 };
 
 export default useInput;
