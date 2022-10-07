@@ -1,4 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { uiActions } from './ui-slice';
+import { firebaseClient } from '../api';
+
 const initialState = { items: [], totalQuantity: 0, totalAmount: 0 };
 
 const cartSlice = createSlice({
@@ -37,6 +40,43 @@ const cartSlice = createSlice({
     },
   },
 });
+
+// action thunk
+export const sendCartData = cart => {
+  return async dispatch => {
+    dispatch(
+      uiActions.showNotification({
+        status: 'pending',
+        title: 'Sending...',
+        message: 'Sending cart data!',
+      })
+    );
+    try {
+      const response = await firebaseClient.put(
+        'https://react-advanced-redux-500a6-default-rtdb.firebaseio.com/cart.json',
+        cart
+      );
+      if (response.status !== 200) {
+        throw new Error('Sending cart data failed.');
+      }
+      dispatch(
+        uiActions.showNotification({
+          status: 'success',
+          title: 'Success!',
+          message: 'Sent cart data successfully!',
+        })
+      );
+    } catch {
+      dispatch(
+        uiActions.showNotification({
+          status: 'error',
+          title: 'Error!',
+          message: 'Sending cart data failed!',
+        })
+      );
+    }
+  };
+};
 
 export const cartActions = cartSlice.actions;
 export default cartSlice.reducer;

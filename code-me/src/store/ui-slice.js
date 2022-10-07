@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-const initialState = { isCartShown: false };
+const initialState = { isCartShown: false, notification: null };
 
 const uiSlice = createSlice({
   name: 'ui',
@@ -8,6 +8,13 @@ const uiSlice = createSlice({
     toggleShowCart(state) {
       state.isCartShown = !state.isCartShown;
     },
+    showNotification(state, action) {
+      state.notification = {
+        status: action.payload.status,
+        title: action.payload.title,
+        message: action.payload.message,
+      };
+    }
   },
 });
 
