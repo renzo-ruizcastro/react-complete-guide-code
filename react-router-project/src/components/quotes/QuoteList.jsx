@@ -1,4 +1,4 @@
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import { Fragment } from 'react';
 
 import QuoteItem from './QuoteItem';
@@ -20,6 +20,7 @@ const QuoteList = props => {
   // we can use useLocation to read the query params from the URL
   // useLocation give us access to the location object which has information about the current URL
   const location = useLocation();
+  const match = useRouteMatch();
   console.log(location);
   const queryParams = new URLSearchParams(location.search);
   const isSortingAscending = queryParams.get('sort') === 'asc';
@@ -28,7 +29,11 @@ const QuoteList = props => {
   const changeSortingHandler = event => {
     // ? preceeds the query params
     // pushing actually re-renders the component
-    history.push('/quotes?sort=' + (isSortingAscending ? 'desc' : 'asc'));
+    history.push({
+      pathname: match.url,
+      search: `?sort=${isSortingAscending ? 'desc' : 'asc'}`,
+    });
+    // history.push(`${match.url}?sort=${isSortingAscending ? 'desc' : 'asc'}`);
   };
   return (
     <Fragment>
