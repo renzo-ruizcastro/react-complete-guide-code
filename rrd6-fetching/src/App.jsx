@@ -9,11 +9,15 @@ import {
 
 import BlogLayout from './pages/BlogLayout';
 import BlogPostsPage, { loader as blogPostsLoader } from './pages/BlogPosts';
-import NewPostPage from './pages/NewPost';
+import NewPostPage, { action as newPostAction } from './pages/NewPost';
+import { action as newsletterAction } from './pages/Newsletter';
 import PostDetailPage, { loader as postDetailLoader } from './pages/PostDetail';
 import RootLayout from './pages/RootLayout';
 import WelcomePage from './pages/Welcome';
 import ErrorPage from './pages/Error';
+import DeferredBlogPostsPage, {
+  loader as deferredBlogPostsLoader,
+} from './pages/DeferredBlogPosts';
 
 // const router = createBrowserRouter([
 //   {path: '/', element: <WelcomePage />},
@@ -29,7 +33,13 @@ const router = createBrowserRouter(
       {/* index routes are default routes when the parent route is called */}
       <Route index element={<WelcomePage />} />
       <Route path="/blog" element={<BlogLayout />}>
-        <Route index element={<BlogPostsPage />} loader={blogPostsLoader} />
+        {/* <Route index element={<BlogPostsPage />} loader={blogPostsLoader} /> */}
+        <Route
+          index
+          element={<DeferredBlogPostsPage />}
+          loader={deferredBlogPostsLoader}
+        />
+
         <Route
           path=":id"
           element={<PostDetailPage />}
@@ -37,7 +47,12 @@ const router = createBrowserRouter(
           // errorElement={<p>An error ocurred</p>}
         />
       </Route>
-      <Route path="/blog/new" element={<NewPostPage />} />
+      <Route
+        path="/blog/new"
+        element={<NewPostPage />}
+        action={newPostAction}
+      />
+      <Route path="/newsletter" action={newsletterAction} />
     </Route>
   )
 );

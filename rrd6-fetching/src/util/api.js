@@ -1,12 +1,26 @@
+import { sleep } from './sleep';
+
 const FIREBASE_DOMAIN = 'https://jsonplaceholder.typicode.com';
 
 function FetchingException(errorData) {
   this.message = errorData.message;
-  this.code = errorData.code;
+  this.status = errorData.status;
   this.name = 'FetchingException';
 }
 
 export async function getPosts() {
+  const response = await fetch(`${FIREBASE_DOMAIN}/posts`);
+  if (!response.ok) {
+    throw new FetchingException({
+      message: 'Failed to fetch posts.',
+      status: 500,
+    });
+  }
+  return response.json();
+}
+
+export async function getSlowPosts() {
+  await sleep(2000);
   const response = await fetch(`${FIREBASE_DOMAIN}/posts`);
   if (!response.ok) {
     throw new FetchingException({
