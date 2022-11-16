@@ -1,31 +1,52 @@
+// To build run the following command in the terminal
+// yarn run build
+
+import React, { Suspense } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 
-import AllQuotes from './pages/AllQuotes';
-import QuoteDetail from './pages/QuoteDetail';
-import NewQuote from './pages/NewQuote';
-import NotFound from './pages/NotFound';
+// import AllQuotes from './pages/AllQuotes';
+// import QuoteDetail from './pages/QuoteDetail';
+// import NewQuote from './pages/NewQuote';
+// import NotFound from './pages/NotFound';
 import Layout from './components/layout/Layout';
+
+import LoadingSpinner from './components/ui/LoadingSpinner';
+
+// Only download the code when its needed
+const NewQuote = React.lazy(() => import('./pages/NewQuote'));
+// It's not enough, this import may take a few ms so we need to add a fallback. This feature is given by React.Suspense
+const QuoteDetail = React.lazy(() => import('./pages/QuoteDetail'));
+const NotFound = React.lazy(() => import('./pages/NotFound'));
+const AllQuotes = React.lazy(() => import('./pages/AllQuotes'));
 
 function App() {
   return (
     <Layout>
-      <Switch>
-        <Route path="/" exact>
-          <Redirect to="/quotes" />
-        </Route>
-        <Route path="/quotes" exact>
-          <AllQuotes />
-        </Route>
-        <Route path="/quotes/:quoteId">
-          <QuoteDetail />
-        </Route>
-        <Route path="/new-quote">
-          <NewQuote />
-        </Route>
-        <Route path="*">
-          <NotFound />
-        </Route>
-      </Switch>
+      <Suspense
+        fallback={
+          <div className="centered">
+            <LoadingSpinner />
+          </div>
+        }
+      >
+        <Switch>
+          <Route path="/" exact>
+            <Redirect to="/quotes" />
+          </Route>
+          <Route path="/quotes" exact>
+            <AllQuotes />
+          </Route>
+          <Route path="/quotes/:quoteId">
+            <QuoteDetail />
+          </Route>
+          <Route path="/new-quote">
+            <NewQuote />
+          </Route>
+          <Route path="*">
+            <NotFound />
+          </Route>
+        </Switch>
+      </Suspense>
     </Layout>
   );
 }
