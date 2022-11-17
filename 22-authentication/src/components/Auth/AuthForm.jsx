@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from 'react';
+import { useState, useRef, useContext, useEffect } from 'react';
 import AuthContext from '../../store/auth-context';
 import { useFetch } from '../../hooks';
 import classes from './AuthForm.module.css';
@@ -10,10 +10,17 @@ const API_SIGNUP = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?ke
 const AuthForm = () => {
   const authCtx = useContext(AuthContext);
   const [isLogin, setIsLogin] = useState(true);
-  
+
   const { sendRequest, data, error, isLoading } = useFetch();
 
-  console.log(data, error, isLoading);
+  useEffect(() => {
+    if (error) {
+      alert(error);
+    }
+    if (data) {
+      authCtx.login(data.idToken);
+    }
+  }, [error, data]);
 
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -43,13 +50,6 @@ const AuthForm = () => {
       },
     };
     await sendRequest(url, options);
-    console.log(error, data, isLoading);
-    if (error) {
-      alert(error);
-    }
-    if (data) {
-      authCtx.login(data.idToken);
-    }
 
     // without custom hook, works fine
 
