@@ -1,26 +1,28 @@
-import { Switch, Route } from 'react-router-dom';
+import {
+  Routes,
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from 'react-router-dom';
 
-import Layout from './components/Layout/Layout';
-import UserProfile from './components/Profile/UserProfile';
+import RootLayout from './components/Layout/RootLayout';
+import ProfilePage from './pages/ProfilePage';
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
 
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<RootLayout />}>
+      <Route index element={<HomePage />} />
+      <Route path="auth" element={<AuthPage />} />
+      <Route path="profile" element={<ProfilePage />} />
+    </Route>
+  )
+);
+
 function App() {
-  return (
-    <Layout>
-      <Switch>
-        <Route path='/' exact>
-          <HomePage />
-        </Route>
-        <Route path='/auth'>
-          <AuthPage />
-        </Route>
-        <Route path='/profile'>
-          <UserProfile />
-        </Route>
-      </Switch>
-    </Layout>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
