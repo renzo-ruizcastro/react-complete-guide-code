@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-
+import { useState, useRef, useContext } from 'react';
+import AuthContext from '../../store/auth-context';
 import classes from './AuthForm.module.css';
 
 const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
@@ -7,6 +7,7 @@ const API_SINGIN = `https://identitytoolkit.googleapis.com/v1/accounts:signInWit
 const API_SIGNUP = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`;
 
 const AuthForm = () => {
+  const authCtx = useContext(AuthContext);
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const emailInputRef = useRef();
@@ -30,13 +31,14 @@ const AuthForm = () => {
       password: enteredPassword,
       returnSecureToken: true,
     };
-    fetch(url, {
+    const options = {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {
         'Content-Type': 'application/json',
       },
-    })
+    };
+    fetch(url, options)
       .then(res => {
         setIsLoading(false);
         if (res.ok) {
@@ -55,7 +57,7 @@ const AuthForm = () => {
         }
       })
       .then(data => {
-        console.log(data);
+        authCtx.login(data.idToken);
       })
       .catch(err => {
         alert(err.message);
