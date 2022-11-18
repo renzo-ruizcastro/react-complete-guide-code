@@ -2,12 +2,14 @@ import { useState, useRef, useContext, useEffect } from 'react';
 import AuthContext from '../../store/auth-context';
 import { useFetch } from '../../hooks';
 import classes from './AuthForm.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
 const API_SINGIN = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
 const API_SIGNUP = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`;
 
 const AuthForm = () => {
+  const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
   const [isLogin, setIsLogin] = useState(true);
 
@@ -18,7 +20,13 @@ const AuthForm = () => {
       alert(error);
     }
     if (data) {
-      authCtx.login(data.idToken);
+      const expirationTime = new Date(
+        new Date().getTime() + +data.expiresIn * 1000
+      );
+      authCtx.login(data.idToken, expirationTime.toISOString());
+      navigate('/', {
+        replace: true,
+      });
     }
   }, [error, data]);
 
@@ -50,34 +58,6 @@ const AuthForm = () => {
       },
     };
     await sendRequest(url, options);
-
-    // without custom hook, works fine
-
-    // setIsLoading(true);
-    // fetch(url, options)
-    //   .then(res => {
-    //     setIsLoading(false);
-    //     if (res.ok) {
-    //       return res.json();
-    //     } else {
-    //       // Firebase password must be at least 6 characters long
-    //       return res.json().then(data => {
-    //         // show error modal
-    //         let errorMessage = 'Authentication failed!';
-    //         // Checking firebase error structure
-    //         if (data && data.error && data.error.message) {
-    //           errorMessage = data.error.message;
-    //         }
-    //         throw new Error(errorMessage);
-    //       });
-    //     }
-    //   })
-    //   .then(data => {
-    //     authCtx.login(data.idToken);
-    //   })
-    //   .catch(err => {
-    //     alert(err.message);
-    //   });
   };
 
   return (
